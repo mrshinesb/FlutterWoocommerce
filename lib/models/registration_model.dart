@@ -1,43 +1,72 @@
-import 'dart:convert';
+class UserRegistrationModel {
+  final String username;
+  final String email;
+  final String password;
+  final String confirmPassword;
 
-UserResponseModel userResponseFromJson(String str) =>
-    UserResponseModel.fromJson(json.decode(str));
+  UserRegistrationModel({
+    required this.username,
+    required this.email,
+    required this.password,
+    required this.confirmPassword,
+  });
 
-class UserModel {
-  String name;
-  String email;
-  String password;
+  // Empty constructor
+  UserRegistrationModel.empty()
+    : username = '',
+      email = '',
+      password = '',
+      confirmPassword = '';
 
-  UserModel({required this.name, required this.email, required this.password});
-
-  UserModel.fromJson(Map<String, dynamic> json)
-    : name = json['name'] as String,
-      email = json['email'] as String,
-      password = json['password'] as String;
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['password'] = this.password;
-    return data;
+  // Copy with method
+  UserRegistrationModel copyWith({
+    String? username,
+    String? email,
+    String? password,
+    String? confirmPassword,
+  }) {
+    return UserRegistrationModel(
+      username: username ?? this.username,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      confirmPassword: confirmPassword ?? this.confirmPassword,
+    );
   }
-}
 
-class UserResponseModel {
-  int code;
-  String message;
+  // Validation methods
+  bool get isUsernameValid => username.length >= 3;
+  bool get isEmailValid =>
+      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  bool get isPasswordValid => password.length >= 6;
+  bool get doPasswordsMatch => password == confirmPassword;
+  bool get isFormValid =>
+      isUsernameValid && isEmailValid && isPasswordValid && doPasswordsMatch;
 
-  UserResponseModel(this.code, this.message);
-
-  UserResponseModel.fromJson(Map<String, dynamic> json)
-    : code = json['code'] as int,
-      message = json['message'] as String;
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['message'] = this.message;
-    return data;
+  // Error messages
+  String? get usernameError {
+    if (username.isEmpty) return null;
+    return isUsernameValid ? null : 'Username must be at least 3 characters';
   }
+
+  String? get emailError {
+    if (email.isEmpty) return null;
+    return isEmailValid ? null : 'Please enter a valid email';
+  }
+
+  String? get passwordError {
+    if (password.isEmpty) return null;
+    return isPasswordValid ? null : 'Password must be at least 6 characters';
+  }
+
+  String? get confirmPasswordError {
+    if (confirmPassword.isEmpty) return null;
+    return doPasswordsMatch ? null : 'Passwords do not match';
+  }
+
+  // Convert to JSON for API request (without confirmPassword)
+  Map<String, dynamic> toJson() => {
+    'username': username,
+    'email': email,
+    'password': password,
+  };
 }

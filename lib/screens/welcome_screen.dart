@@ -25,7 +25,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 // Welcome Text
                 const Text(
-                  "Welcome to GlobalCart!",
+                  "Welcome to SB GLOBAL!",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
